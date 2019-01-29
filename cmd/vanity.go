@@ -29,6 +29,8 @@ import (
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
+var tries = 0
+
 var useSuffixP *bool
 
 // vanityCmd represents the vanity command
@@ -89,6 +91,12 @@ func search(wg *sync.WaitGroup, useSuffix bool, matchArg string) {
 	t0 := time.Now()
 
 	for {
+		tries++
+
+		if tries%100000 == 0 {
+			fmt.Printf("tries: %v\n", tries)
+		}
+
 		kp, err := keypair.Random()
 
 		if err != nil {
@@ -112,7 +120,7 @@ func search(wg *sync.WaitGroup, useSuffix bool, matchArg string) {
 
 		if found {
 			t1 := time.Now()
-			fmt.Printf("Search took %v seconds.\n", t1.Sub(t0).Seconds())
+			fmt.Printf("Search took %v seconds. tries: %v\n", t1.Sub(t0).Seconds(), tries)
 
 			fmt.Printf("Secret seed: %s\n", kp.Seed())
 			fmt.Printf("Public: %s\n", kp.Address())
