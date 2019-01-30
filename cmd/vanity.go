@@ -93,7 +93,7 @@ func search(wg *sync.WaitGroup, useSuffix bool, matchArg string) {
 	for {
 		tries++
 
-		if tries%100000 == 0 {
+		if tries%500000 == 0 {
 			fmt.Printf("tries: %v\n", tries)
 		}
 
