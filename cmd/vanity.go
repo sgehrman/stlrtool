@@ -32,6 +32,7 @@ const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 var tries = 0
 
 var useSuffixP *bool
+var anywhereP *bool
 
 // vanityCmd represents the vanity command
 var vanityCmd *cobra.Command
@@ -63,6 +64,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	useSuffixP = vanityCmd.Flags().BoolP("suffix", "s", false, "find suffix instead of prefix")
+	anywhereP = vanityCmd.Flags().BoolP("anywhere", "a", false, "find match anywhere")
 }
 
 func vanity(args []string) {
@@ -79,13 +81,13 @@ func vanity(args []string) {
 	wg.Add(1)
 
 	for i := 0; i < 42; i++ {
-		go search(&wg, *useSuffixP, matchArg)
+		go search(&wg, *useSuffixP, *anywhereP, matchArg)
 	}
 
 	wg.Wait()
 }
 
-func search(wg *sync.WaitGroup, useSuffix bool, matchArg string) {
+func search(wg *sync.WaitGroup, useSuffix bool, anywhere bool, matchArg string) {
 	defer wg.Done()
 
 	t0 := time.Now()
@@ -105,7 +107,11 @@ func search(wg *sync.WaitGroup, useSuffix bool, matchArg string) {
 
 		found := false
 
-		if useSuffix {
+		if anywhere {
+			if strings.Index(kp.Address(), matchArg) != -1 {
+				found = true
+			}
+		} else if useSuffix {
 			if strings.HasSuffix(kp.Address(), matchArg) {
 				found = true
 			}
